@@ -20,8 +20,8 @@ end
 local function executeHook(hook)
     local cmd = 'sh'
     if love.build.os == 'windows' then cmd = 'bash' end
-    local value = os.execute(cmd .. ' ' .. love.build.path .. '/' .. hook .. ' ' .. love.build.path .. ' ' .. love.build.opts.version)
-    if value ~= 0 and love.build.hooks.report_failure == true then
+    local result = os.execute(cmd .. ' ' .. love.build.path .. '/' .. hook .. ' ' .. love.build.path .. ' ' .. love.build.opts.version)
+    if result ~= 0 and love.build.hooks.report_errors then
         return false
     end
     return true
@@ -210,7 +210,7 @@ return {
       love.build.log('preprocess: ' .. love.build.path .. '/' .. love.build.hooks.before_build)
       local hookSuccess = executeHook(love.build.hooks.before_build)
       if not hookSuccess then
-        love.build.err("preprocess hook failed")
+        return love.build.err("preprocess hook failed")
       end
     end
 
@@ -966,7 +966,7 @@ return {
       love.build.log('postprocess: ' .. love.build.path .. '/' .. love.build.hooks.after_build)
       local hookSuccess = executeHook(love.build.hooks.after_build)
       if not hookSuccess then
-        love.build.err("postprocess hook failed")
+        return love.build.err("postprocess hook failed")
       end
     end
 
