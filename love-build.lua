@@ -21,7 +21,7 @@ local function executeHook(hook)
     local cmd = 'sh'
     if love.build.os == 'windows' then cmd = 'bash' end
     local value = os.execute(cmd .. ' ' .. love.build.path .. '/' .. hook .. ' ' .. love.build.path .. ' ' .. love.build.opts.version)
-    if value != 0 and love.build.hooks.report_failure == true then
+    if value ~= 0 and love.build.hooks.report_failure == true then
         return false
     end
     return true
