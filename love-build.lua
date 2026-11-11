@@ -14,6 +14,19 @@ if love.window and love.graphics then
     " AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz+#:-'!?.0123456789,/ %()çö<_", 1)
 end
 
+-- Runs the a pre/post processing hook and returns a boolean value signalling
+-- sucess. If the love.build.hooks.report_failure flag is not explicitly set to
+-- true it will always be considered a success.
+local function executeHook(hook)
+    local cmd = 'sh'
+    if love.build.os == 'windows' then cmd = 'bash' end
+    local value = os.execute(cmd .. ' ' .. love.build.path .. '/' .. hook .. ' ' .. love.build.path .. ' ' .. love.build.opts.version)
+    if value != 0 and love.build.hooks.report_failure == true then
+        return false
+    end
+    return true
+end
+
 return {
 
   -- setup general love.build properties
@@ -195,10 +208,10 @@ return {
     -- run preprocess if any 
     if love.build.hooks.before_build then
       love.build.log('preprocess: ' .. love.build.path .. '/' .. love.build.hooks.before_build)
-      local cmd = 'sh'
-      -- TODO: error check here add love.build.hooks.report_failure flag
-      if love.build.os == 'windows' then cmd = 'bash' end
-      os.execute(cmd .. ' ' .. love.build.path .. '/' .. love.build.hooks.before_build .. ' ' .. love.build.path .. ' ' .. love.build.opts.version)
+      local hookSuccess = executeHook(love.build.hooks.before_build)
+      if not hookSuccess then
+        love.build.err("preprocess hook failed")
+      end
     end
 
     love.build.log('step finished in ' .. love.build.formatTime(love.timer.getTime() - start_time))
@@ -951,10 +964,10 @@ return {
     -- run postprocess if any 
     if love.build.hooks.after_build then
       love.build.log('postprocess: ' .. love.build.path .. '/' .. love.build.hooks.after_build)
-      local cmd = 'sh'
-      -- TODO: error check here add love.build.hooks.report_failure flag
-      if love.build.os == 'windows' then cmd = 'bash' end
-      os.execute(cmd .. ' ' .. love.build.path .. '/' .. love.build.hooks.after_build .. ' ' .. love.build.path .. ' ' .. love.build.opts.output .. ' ' .. love.build.opts.version)
+      local hookSuccess = executeHook(love.build.hooks.after_build)
+      if not hookSuccess then
+        love.build.err("postprocess hook failed")
+      end
     end
 
     -- finalise build
