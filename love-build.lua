@@ -196,6 +196,7 @@ return {
     if love.build.hooks.before_build then
       love.build.log('preprocess: ' .. love.build.path .. '/' .. love.build.hooks.before_build)
       local cmd = 'sh'
+      -- TODO: error check here add love.build.hooks.report_failure flag
       if love.build.os == 'windows' then cmd = 'bash' end
       os.execute(cmd .. ' ' .. love.build.path .. '/' .. love.build.hooks.before_build .. ' ' .. love.build.path .. ' ' .. love.build.opts.version)
     end
@@ -951,6 +952,7 @@ return {
     if love.build.hooks.after_build then
       love.build.log('postprocess: ' .. love.build.path .. '/' .. love.build.hooks.after_build)
       local cmd = 'sh'
+      -- TODO: error check here add love.build.hooks.report_failure flag
       if love.build.os == 'windows' then cmd = 'bash' end
       os.execute(cmd .. ' ' .. love.build.path .. '/' .. love.build.hooks.after_build .. ' ' .. love.build.path .. ' ' .. love.build.opts.output .. ' ' .. love.build.opts.version)
     end
